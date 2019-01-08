@@ -423,6 +423,8 @@ compute_mmd <- function(x, y, sigma_sqr = 1) {
 ---
 # So, what else is there to eager execution?
 
+<br />
+
 - When in doubt, print it out
 
 - Reduce duplicated / boilerplate code 
@@ -613,3 +615,5 @@ See: [Getting started with TensorFlow Probability](https://blogs.rstudio.com/ten
 
 ---
 # Thanks a lot for your attention!!
+
+

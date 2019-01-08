@@ -1,1 +1,1 @@
-# rstudio_conf_2019_eager_execution
+Slides for my talk "Why TensorFlow eager execution matters" at rstudio::conf 2019.
