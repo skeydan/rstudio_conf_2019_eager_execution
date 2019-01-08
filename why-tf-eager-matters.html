@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Why TensorFlow eager execution matters</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Sigrid Keydana" />
+    <link rel="stylesheet" href="theme/rstudio.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Why TensorFlow eager execution matters
+### Sigrid Keydana
+### rstudio::conf 2019
+
+---
+
+class: inverse, middle, center
+
+#So deep learning is easy...
+
+---
+# Red panda? Or giant panda?
+
+&lt;br /&gt;
+
+&lt;img src="red_panda.jpg" style = "float:left;" /&gt;
+&lt;img src="giant_panda.jpg" style = "float:right;" /&gt;
+
+
+---
+# Just use the Keras Sequential API ...
+
+
+```r
+*model &lt;- keras_model_sequential() %&gt;%
+  layer_conv_2d(...) %&gt;% 
+  layer_max_pooling_2d(...) %&gt;% 
+  layer_conv_2d(...) %&gt;% 
+  layer_max_pooling_2d(...) %&gt;% 
+  layer_conv_2d(...) %&gt;% 
+  layer_max_pooling_2d(...) %&gt;% 
+  layer_flatten() %&gt;% 
+  layer_dense(units = 1, activation = "sigmoid")
+
+*model %&gt;% compile(
+  loss = "binary_crossentropy",
+  optimizer = "adam",
+  metrics = c("accuracy")
+)
+
+*model %&gt;% fit(
+  x_train, y_train,
+  epochs = epochs,
+  validation_split = 0.2
+)
+```
+
+
+
+---
+# Who do I look like?
+
+
+&lt;img src="celebs.png" width="70%"/&gt;
+
+
+_Okay_ ...
+
+---
+# The Keras Functional API has you covered ...
+
+
+```r
+input &lt;- layer_input(shape = c(224, 224, 3))
+output &lt;- digit_input %&gt;% 
+  # lots of conv layers here
+  layer_flatten()
+
+shared_model &lt;- keras_model(input, output)
+
+# compile, train ...
+
+# now use to say if 2 people are the same
+person_a &lt;- layer_input(shape = c(224, 224, 3))
+person_b &lt;- layer_input(shape = c(224, 224, 3))
+
+out_a &lt;- person_a %&gt;% shared_model
+out_b &lt;- person_b %&gt;% shared_model
+
+out &lt;- layer_concatenate(c(out_a, out_b)) %&gt;% 
+  layer_dense(units = 1, activation = "sigmoid")
+
+classification_model &lt;- keras_model(inputs = c(person_a, person_b), out)
+```
+
+
+---
+# The world needs more penguins...
+
+
+
+&lt;br /&gt;
+
+Let's get creative!
+
+
+- Generative adversarial networks (GANs)
+
+- Variational autoencoders (VAEs)
+
+
+&lt;img src="tux.jpg"  width="200px" style = "float: right; margin-right: 150px; " /&gt;
+
+
+---
+# Not MNIST: Google Quick, Draw!
+
+&lt;br /&gt; 
+
+&lt;img src="penguins.png" width="1000px"/&gt;
+
+---
+# Generative adversarial networks: It's a game
+
+&lt;br /&gt;
+
+&lt;figure&gt;
+&lt;img src="gan.png" width=800px/&gt;
+&lt;figcaption&gt;&lt;br /&gt;Image source: https://arxiv.org/pdf/1710.07035.pdf&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+
+
+---
+# Coding a GAN, the static graph way
+
+1. Define generator and discriminator models.
+
+2. Freeze discriminator weights and define an overall model as `$$GAN = f(\ discriminator\ (\ generator(\ random\_input\ )))$$` Discriminator weights are frozen in GAN model only!
+
+4. Training: For each epoch, iterate over data batches:
+ 
+ - generate fake images with generator
+ 
+ - call discriminator on fake as well as real images, with targets "fake" and "real", and do backprop on discriminator
+ 
+ - train GAN on random noise, with targets "real", and do backprop on generator only
+ 
+ &lt;br /&gt;
+ 
+
+---
+class: inverse, middle, center
+
+# Eager execution: All in the game, yo
+
+
+---
+# Aside: Keras custom models
+
+
+- Can be used with static as well as with eager execution
+
+- Documentation: [https://tensorflow.rstudio.com/keras/articles/custom_models.html](https://tensorflow.rstudio.com/keras/articles/custom_models.html)
+
+
+```r
+keras_model_simple_mlp &lt;- function(num_classes, name = NULL) {
+  
+  # define and return a custom model
+  keras_model_custom(name = name, function(self) {
+    
+    # create layers we'll need for the call (this code executes once)
+    self$dense1 &lt;- layer_dense(units = 32, activation = "relu")
+    self$dense2 &lt;- layer_dense(units = num_classes, activation = "softmax")
+    
+    # implement call (this code executes during training &amp; inference)
+    function(inputs, mask = NULL) {
+      self$dense1(inputs) %&gt;%
+        self$dense2()
+    }
+  })
+}
+```
+
+---
+# GAN for humans: The actors (1)
+
+
+First, the ingenious fraudster ...
+
+
+
+```r
+generator &lt;-
+  function(name = NULL) {
+    keras_model_custom(name = name, function(self) {
+      
+      # define some conv and deconv layers here
+      # deconvolution ("transposed convolution") does upsampling
+      
+      function(inputs,
+               mask = NULL,
+               training = TRUE) {
+        
+        # starting from random noise, apply successive conv and deconv layers
+        # until we have a complete image of size 28x28x1
+      }
+    })
+  }
+
+generator &lt;- generator()
+```
+
+
+
+
+
+---
+# GAN for humans: The actors (2)
+
+Next, the dutiful investigator ...
+
+
+```r
+discriminator &lt;-
+  function(name = NULL) {
+    keras_model_custom(name = name, function(self) {
+      
+      # just some conv layers (with dropout, batch norm...)
+      # followed by a 1-dim sigmoid activation
+      
+      function(inputs,
+               mask = NULL,
+               training = TRUE) {
+        
+        # do stuff
+        
+      }
+    })
+  }
+
+discriminator &lt;- discriminator()
+```
+
+
+---
+# They have different goals...
+
+
+Discriminator: I need to make sure I spot the fake
+
+
+```r
+discriminator_loss &lt;- function(real_output, generated_output) {
+  real_loss &lt;-
+    tf$losses$sigmoid_cross_entropy(multi_class_labels = k_ones_like(real_output),
+                                    logits = real_output)
+  generated_loss &lt;-
+    tf$losses$sigmoid_cross_entropy(multi_class_labels = k_zeros_like(generated_output),
+                                    logits = generated_output)
+  real_loss + generated_loss
+}
+```
+
+
+Generator: I need to fool that guy
+
+
+```r
+generator_loss &lt;- function(disc_verdict) {
+  tf$losses$sigmoid_cross_entropy(tf$ones_like(disc_verdict), disc_verdict)
+}
+```
+
+
+---
+# Let the game begin!
+
+
+
+```r
+# iterate over epochs
+  for (epoch in seq_len(num_epochs)) {
+    
+    iter &lt;- make_iterator_one_shot(train_dataset)
+    
+    # iterate over dataset
+    until_out_of_range({
+      
+      with(tf$GradientTape() %as% gen_tape, {
+        with(tf$GradientTape() %as% disc_tape, {
+          
+          # record what our actors are doing
+          # calculate their respective losses, too
+          
+        })
+      })
+      
+      # get gradients, separately for generator and discriminator, that is:
+      # --&gt; gradients of generator loss w.r.t. generator's weights
+      # --&gt; gradients of discriminator loss w.r.t. discriminator's weights
+      
+      # apply gradients, separately for generator and discriminator
+   })
+  }
+```
+
+
+
+---
+# Let's see the penguins evolve
+
+&lt;img src="out.jpg" /&gt;
+
+---
+# Variational autoencoders: Uncovering hidden dimensions
+
+&lt;br /&gt;
+
+&lt;figure&gt;
+&lt;img src="vae.png" width=800px/&gt;
+&lt;figcaption&gt;&lt;br /&gt;Image source: https://ermongroup.github.io/blog/a-tutorial-on-mmd-variational-autoencoders/&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+---
+# Penguins want snow 
+
+Problem: Where to get the training data? ... trying [Gravner-Griffeath](http://psoup.math.wisc.edu/papers/h2l.pdf)
+
+&lt;img src="snowflakes.png" width="700px"/&gt;
+
+
+
+---
+# The goal is to find a sparse, informative latent code ...
+
+
+Encoder:
+
+
+```r
+encoder_model &lt;- function(name = NULL) {
+  keras_model_custom(name = name, function(self) {
+    # few conv layers and a dense layer for the latent code
+    function (x, mask = NULL) {
+      # pipe through conv layers and return code
+    }
+  })
+}
+```
+
+Decoder:
+
+
+```r
+decoder_model &lt;- function(name = NULL) {
+  keras_model_custom(name = name, function(self) {
+    # mainly, few deconv layers to upsample from code
+    function (x, mask = NULL) {
+     # successive upsampling, the output image
+    }
+  })
+}
+```
+
+
+
+---
+# Thus, here all action is in the loss function
+
+&lt;br /&gt;
+
+`$$k(z,z')=\frac{e^{||z-z'||}}{2\sigma^2}$$`
+
+
+```r
+compute_kernel &lt;- function(x, y) {
+  # use Gaussian kernel to compute similarity
+}
+```
+
+&lt;br /&gt;
+
+`$$MMD(p(z)||q(z))=E_{p(z),p(z')}[k(z,z')]+E_{q(z),q(z')}[k(z,z')]−2E_{p(z),q(z')}[k(z,z')]$$`
+
+```r
+compute_mmd &lt;- function(x, y, sigma_sqr = 1) {
+ 
+  # calculate maximum mean discrepancy (MMD)
+}
+```
+
+
+---
+# Then, it's just a straightforward training loop 
+
+
+```r
+# iterate over epochs
+  for (epoch in seq_len(num_epochs)) {
+    
+    iter &lt;- make_iterator_one_shot(train_dataset)
+    
+    # iterate over dataset
+    until_out_of_range({
+      
+       with(tf$GradientTape(persistent = TRUE) %as% tape, {
+        
+        mean &lt;- encoder(x) # data -&gt; latent code
+        preds &lt;- decoder(mean) # code -&gt; reconstruction
+      
+        # compute losses
+        true_samples &lt;- k_random_normal(shape = c(batch_size, latent_dim), dtype = tf$float32)
+        loss_mmd &lt;- compute_mmd(true_samples, mean)
+        loss_nll &lt;- k_mean(k_square(x - preds))
+        loss &lt;- loss_nll + loss_mmd
+    })
+      
+    # compute encoder's and decoder's gradients
+    # perform backprop on both of them
+  }
+```
+
+---
+# Let's see the snowflakes
+
+
+&lt;img src="snow_generated.png" /&gt;
+
+---
+# So, what else is there to eager execution?
+
+- When in doubt, print it out
+
+- Reduce duplicated / boilerplate code 
+
+- Go beyond layer sequencing
+
+
+---
+# Easy debugging
+
+
+Gradients? Loss? Actual values? Just print them
+
+
+```r
+with(tf$GradientTape() %as% gen_tape, {
+  with(tf$GradientTape() %as% disc_tape, {
+  
+    generated_images &lt;- generator(noise)
+*   print(generated_images)
+    
+    disc_real_output &lt;- discriminator(batch, training = TRUE)
+    disc_generated_output &lt;- discriminator(generated_images, training = TRUE)
+    
+    gen_loss &lt;- generator_loss(disc_generated_output)
+*   print(gen_loss)
+    disc_loss &lt;- discriminator_loss(disc_real_output, disc_generated_output)
+  })
+  
+  gradients_of_generator &lt;- gen_tape$gradient(gen_loss, generator$variables)
+  gradients_of_discriminator &lt;- disc_tape$gradient(disc_loss, discriminator$variables)
+* print(gradients_of_discriminator)
+})
+```
+
+
+---
+# Modular code (1): Define reusable modules
+
+
+```r
+downsample &lt;- function(# ...) {
+  keras_model_custom(name = name, function(self) {
+    
+    # a conv layer, plus batchnorm, dropout ...
+    
+    function(x, mask = NULL, training = TRUE) {
+      
+      # (conditionally) call said layers
+    }
+  })
+}
+```
+
+
+
+```r
+upsample &lt;- function(# ...) {
+  keras_model_custom(name = name, function(self) {
+    
+    # dropout, deconv, batchnorm...
+    
+    function(xs, mask = NULL, training = TRUE) {
+      
+      # call layers and do stuff
+    }
+  })
+}
+```
+
+
+---
+# Modular code (2): Use them
+
+
+```r
+generator &lt;- function(name = "generator") {
+  
+  keras_model_custom(name = name, function(self) {
+    
+    self$down1 &lt;- downsample(64, 4, apply_batchnorm = FALSE)
+    self$down2 &lt;- downsample(128, 4)
+    
+    # and more and more ...
+    
+    self$up1 &lt;- upsample(512, 4, apply_dropout = TRUE)
+    self$up2 &lt;- upsample(512, 4, apply_dropout = TRUE)
+    # and more ...
+    
+    function(x,
+             mask = NULL,
+             training = TRUE) {
+      x1 &lt;- x %&gt;% self$down1(training = training)  
+      x2 &lt;- self$down2(x1, training = training) 
+      x3 &lt;- self$down3(x2, training = training) 
+      # and so on...
+    }
+  })
+}
+```
+
+
+
+
+---
+# Interleaving logic (1): Attention mechanism 
+
+&lt;br /&gt;
+
+&lt;figure&gt;
+&lt;img src="showattendandtell.png" width=800px/&gt;
+&lt;figcaption&gt;&lt;br /&gt;Image source: https://arxiv.org/pdf/1502.03044.pdf&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+---
+# Interleaving logic (2): Attention mechanism
+
+
+```r
+rnn_decoder &lt;- function(embedding_dim, gru_units, vocab_size, name = NULL) {
+    
+  keras_model_custom(name = name, function(self) {
+      
+    # ...
+    self$attention &lt;- attention_module(self$gru_units)
+    
+    function(inputs, mask = NULL) {
+      x &lt;- inputs[[1]]
+      features &lt;- inputs[[2]]
+      hidden &lt;- inputs[[3]]
+        
+      c(context_vector, attention_weights) %&lt;-% 
+        self$attention(list(features, hidden))
+        
+      # ...
+      # ...
+    }
+  })
+}
+```
+
+
+---
+# Get the details
+
+Documentation: [https://tensorflow.rstudio.com/keras/articles/eager_guide.html](https://tensorflow.rstudio.com/keras/articles/eager_guide.html)
+
+
+Applications:
+
+- [Representation learning with MMD-VAE](https://blogs.rstudio.com/tensorflow/posts/2018-10-22-mmd-vae/)
+
+- [More flexible models with TensorFlow eager execution and Keras](https://blogs.rstudio.com/tensorflow/posts/2018-10-02-eager-wrapup/)
+
+- [Image-to-image translation with pix2pix](https://blogs.rstudio.com/tensorflow/posts/2018-09-20-eager-pix2pix/)
+
+- [Attention-based Image Captioning with Keras](https://blogs.rstudio.com/tensorflow/posts/2018-09-17-eager-captioning/)
+
+- [Neural style transfer with eager execution and Keras](https://blogs.rstudio.com/tensorflow/posts/2018-09-10-eager-style-transfer/)
+
+- [Generating images with Keras and TensorFlow eager execution](https://blogs.rstudio.com/tensorflow/posts/2018-08-26-eager-dcgan/)
+
+- [Attention-based Neural Machine Translation with Keras](https://blogs.rstudio.com/tensorflow/posts/2018-07-30-attention-layer/)
+
+---
+# Next up: TensorFlow Probability w/ eager
+
+
+```r
+learnable_prior_model &lt;- function(name = NULL, latent_dim, mixture_components) {
+  
+  keras_model_custom(name = name, function(self) {
+    
+    self$loc &lt;- tf$get_variable(...)
+    self$raw_scale_diag &lt;- tf$get_variable(...)
+    self$mixture_logits &lt;- tf$get_variable(...)
+      
+    function (x, mask = NULL) {
+        tfd$MixtureSameFamily(
+          components_distribution = tfd$MultivariateNormalDiag(
+            loc = self$loc,
+            scale_diag = tf$nn$softplus(self$raw_scale_diag)
+          ),
+          mixture_distribution = tfd$Categorical(logits = self$mixture_logits)
+        )
+      }
+    })
+  }
+```
+
+
+See: [Getting started with TensorFlow Probability](https://blogs.rstudio.com/tensorflow/posts/2019-01-08-getting-started-with-tf-probability/)
+
+---
+# Thanks a lot for your attention!!
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
