@@ -309,7 +309,7 @@ generator_loss <- function(disc_verdict) {
 <img src="out.jpg" />
 
 ---
-# Variational autoencoders: Uncovering hidden dimensions
+# Variational autoencoders: A search for the latent code
 
 <br />
 
