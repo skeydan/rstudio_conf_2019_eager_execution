@@ -23,8 +23,8 @@ class: inverse, middle, center
 
 <br />
 
-<img src="red_panda.jpg" style = "float:left;" />
-<img src="giant_panda.jpg" style = "float:right;" />
+<img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/red_panda.jpg" style = "float:left;" />
+<img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/giant_panda.jpg" style = "float:right;" />
 
 
 ---
@@ -61,7 +61,7 @@ class: inverse, middle, center
 # Who do I look like?
 
 
-<img src="celebs.png" width="70%"/>
+<img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/celebs.png" width="70%"/>
 
 
 _Okay_ ...
@@ -108,7 +108,7 @@ Let's get creative!
 - Variational autoencoders (VAEs)
 
 
-<img src="tux.jpg"  width="200px" style = "float: right; margin-right: 150px; " />
+<img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/tux.jpg"  width="200px" style = "float: right; margin-right: 150px; " />
 
 
 ---
@@ -116,7 +116,7 @@ Let's get creative!
 
 <br /> 
 
-<img src="penguins.png" width="1000px"/>
+<img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/penguins.png" width="1000px"/>
 
 ---
 # Generative adversarial networks: It's a game
@@ -124,7 +124,7 @@ Let's get creative!
 <br />
 
 <figure>
-<img src="gan.png" width=800px/>
+<img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/gan.png" width=800px/>
 <figcaption><br />Image source: https://arxiv.org/pdf/1710.07035.pdf</figcaption>
 </figure>
 
@@ -306,7 +306,7 @@ generator_loss <- function(disc_verdict) {
 ---
 # Let's see the penguins evolve
 
-<img src="out.jpg" />
+<img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/out.jpg" />
 
 ---
 # Variational autoencoders: A search for the latent code
@@ -314,7 +314,7 @@ generator_loss <- function(disc_verdict) {
 <br />
 
 <figure>
-<img src="vae.png" width=800px/>
+<img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/vae.png" width=800px/>
 <figcaption><br />Image source: https://ermongroup.github.io/blog/a-tutorial-on-mmd-variational-autoencoders/</figcaption>
 </figure>
 
@@ -323,7 +323,7 @@ generator_loss <- function(disc_verdict) {
 
 Problem: Where to get the training data? ... trying [Gravner-Griffeath](http://psoup.math.wisc.edu/papers/h2l.pdf)
 
-<img src="snowflakes.png" width="700px"/>
+<img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/snowflakes.png" width="700px"/>
 
 
 
@@ -418,7 +418,7 @@ compute_mmd <- function(x, y, sigma_sqr = 1) {
 # Let's see the snowflakes
 
 
-<img src="snow_generated.png" />
+<img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/snow_generated.png" />
 
 ---
 # So, what else is there to eager execution?
@@ -532,7 +532,7 @@ generator <- function(name = "generator") {
 <br />
 
 <figure>
-<img src="showattendandtell.png" width=800px/>
+<img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/showattendandtell.png" width=800px/>
 <figcaption><br />Image source: https://arxiv.org/pdf/1502.03044.pdf</figcaption>
 </figure>
 

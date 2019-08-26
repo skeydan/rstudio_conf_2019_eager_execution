@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
   <head>
     <title>Why TensorFlow eager execution matters</title>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <meta name="author" content="Sigrid Keydana" />
     <link rel="stylesheet" href="theme/rstudio.css" type="text/css" />
   </head>
@@ -25,8 +25,8 @@ class: inverse, middle, center
 
 &lt;br /&gt;
 
-&lt;img src="red_panda.jpg" style = "float:left;" /&gt;
-&lt;img src="giant_panda.jpg" style = "float:right;" /&gt;
+&lt;img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/red_panda.jpg" style = "float:left;" /&gt;
+&lt;img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/giant_panda.jpg" style = "float:right;" /&gt;
 
 
 ---
@@ -63,7 +63,7 @@ class: inverse, middle, center
 # Who do I look like?
 
 
-&lt;img src="celebs.png" width="70%"/&gt;
+&lt;img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/celebs.png" width="70%"/&gt;
 
 
 _Okay_ ...
@@ -111,7 +111,7 @@ Let's get creative!
 - Variational autoencoders (VAEs)
 
 
-&lt;img src="tux.jpg"  width="200px" style = "float: right; margin-right: 150px; " /&gt;
+&lt;img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/tux.jpg"  width="200px" style = "float: right; margin-right: 150px; " /&gt;
 
 
 ---
@@ -119,7 +119,7 @@ Let's get creative!
 
 &lt;br /&gt; 
 
-&lt;img src="penguins.png" width="1000px"/&gt;
+&lt;img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/penguins.png" width="1000px"/&gt;
 
 ---
 # Generative adversarial networks: It's a game
@@ -127,7 +127,7 @@ Let's get creative!
 &lt;br /&gt;
 
 &lt;figure&gt;
-&lt;img src="gan.png" width=800px/&gt;
+&lt;img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/gan.png" width=800px/&gt;
 &lt;figcaption&gt;&lt;br /&gt;Image source: https://arxiv.org/pdf/1710.07035.pdf&lt;/figcaption&gt;
 &lt;/figure&gt;
 
@@ -313,7 +313,7 @@ generator_loss &lt;- function(disc_verdict) {
 ---
 # Let's see the penguins evolve
 
-&lt;img src="out.jpg" /&gt;
+&lt;img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/out.jpg" /&gt;
 
 ---
 # Variational autoencoders: A search for the latent code
@@ -321,7 +321,7 @@ generator_loss &lt;- function(disc_verdict) {
 &lt;br /&gt;
 
 &lt;figure&gt;
-&lt;img src="vae.png" width=800px/&gt;
+&lt;img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/vae.png" width=800px/&gt;
 &lt;figcaption&gt;&lt;br /&gt;Image source: https://ermongroup.github.io/blog/a-tutorial-on-mmd-variational-autoencoders/&lt;/figcaption&gt;
 &lt;/figure&gt;
 
@@ -330,7 +330,7 @@ generator_loss &lt;- function(disc_verdict) {
 
 Problem: Where to get the training data? ... trying [Gravner-Griffeath](http://psoup.math.wisc.edu/papers/h2l.pdf)
 
-&lt;img src="snowflakes.png" width="700px"/&gt;
+&lt;img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/snowflakes.png" width="700px"/&gt;
 
 
 
@@ -428,7 +428,7 @@ compute_mmd &lt;- function(x, y, sigma_sqr = 1) {
 # Let's see the snowflakes
 
 
-&lt;img src="snow_generated.png" /&gt;
+&lt;img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/snow_generated.png" /&gt;
 
 ---
 # So, what else is there to eager execution?
@@ -545,7 +545,7 @@ generator &lt;- function(name = "generator") {
 &lt;br /&gt;
 
 &lt;figure&gt;
-&lt;img src="showattendandtell.png" width=800px/&gt;
+&lt;img src="https://raw.githubusercontent.com/skeydan/rstudio_conf_2019_eager_execution/master/showattendandtell.png" width=800px/&gt;
 &lt;figcaption&gt;&lt;br /&gt;Image source: https://arxiv.org/pdf/1502.03044.pdf&lt;/figcaption&gt;
 &lt;/figure&gt;
 
@@ -631,6 +631,7 @@ See: [Getting started with TensorFlow Probability](https://blogs.rstudio.com/ten
 ---
 # Thanks a lot for your attention!!
     </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
 "highlightStyle": "github",
@@ -641,16 +642,57 @@ See: [Getting started with TensorFlow Probability](https://blogs.rstudio.com/ten
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
 });
-(function() {
-  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
   if (!r) return;
   s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
   d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
 })();</script>
 
 <script>
 (function() {
-  var i, text, code, codes = document.getElementsByTagName('code');
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
   for (i = 0; i < codes.length;) {
     code = codes[i];
     if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
@@ -664,7 +706,8 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     }
     i++;
   }
-})();
+};
+slideshow._releaseMath(document);
 </script>
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
